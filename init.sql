@@ -32,5 +32,5 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     ip_address VARCHAR(15)
 );
 
--- Inserarea unui user de test
-INSERT INTO users (email, password_hash, role) VALUES ('test_user@authx.test', 'password123', 'MANAGER');
+-- Inserarea unui user MANAGER ( pentru test și pentru demo )
+INSERT INTO users (email, password_hash, role) VALUES ('admin@authx.com', 'password123', 'MANAGER');
