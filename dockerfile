@@ -1,27 +1,25 @@
 FROM node:22-bookworm-slim
 
-# Dependențe externe
-RUN apt-get update && apt-get install -y \
-    && rm -rf /var/lib/apt/lists/*
-
-# Creez utilizatorului razvan-anghel 
-RUN useradd -m -s /bin/bash razvan-anghel
+# Creez utilizatorului razvan-anghel-authx 
+RUN useradd -m -s /bin/bash razvan-anghel-authx
 
 # Setez directorul de lucru în home-ul utilizatorului
-WORKDIR /home/razvan-anghel/app
+WORKDIR /home/razvan-anghel-authx/app
 
-# Copiez fișierele de dependențe și le instalez
-COPY package*.json ./
+# Copiez fisierele de dependinte
+COPY package.json ./
+
+# Instalez dependintele
 RUN npm install
 
 # Copiez restul codului sursă
 COPY . .
 
 # Schimb proprietarul fișierelor
-RUN chown -R razvan-anghel:razvan-anghel /home/razvan-anghel/app
+RUN chown -R razvan-anghel-authx:razvan-anghel-authx /home/razvan-anghel-authx/app
 
 # Trec la utilizatorul non-root 
-USER razvan-anghel
+USER razvan-anghel-authx
 EXPOSE 3000
 
 # Pornirea serverului

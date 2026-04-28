@@ -5,13 +5,13 @@ services:
     container_name: authx-db-v1
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}_v1
+      - POSTGRES_PASSWORD=postgres  # User-ul default pentru postgres, fără a fi suprascrisă parola
+      - POSTGRES_DB=authx_db_v1
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data_v1:/var/lib/postgresql/data
+      - postgres_data_v1:/var/lib/postgresql              # storage-ul bazei de date
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # creearea bazei de date, dacă nu există deja
 
   app:
     build:
@@ -22,8 +22,11 @@ services:
     user: "razvan-anghel-authx"
     ports:
       - "3000:3000"
+    volumes:
+      - .:/home/razvan-anghel-authx/app # Folosesc mounting în dev pentru rapiditate
+      - /home/razvan-anghel-authx/app/node_modules
     environment:
-      - DB_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}_v1
+      - DB_URL=postgres://postgres:postgres@db:5432/authx_db_v1
     depends_on:
       - db
 
