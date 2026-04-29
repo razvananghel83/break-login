@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthX | Internal Resource Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <h1>AuthX</h1>
+                <span class="tag">Internal Manager v1</span>
+            </div>
+
+            <nav class="menu" id="route-menu">
+                <a href="#/login" data-route="login">Login</a>
+                <a href="#/register" data-route="register">Register</a>
+                <a href="#/dashboard" data-route="dashboard">Dashboard</a>
+                <a href="#/logs" data-route="logs" class="hidden">Audit Logs</a>
+            </nav>
+
+            <div class="session-info">
+                <p class="label">Current Session</p>
+                <p id="user-email">Not authenticated</p>
+                <button id="logout-btn" class="btn-secondary" style="width: 100%">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <header class="hero">
+                <div>
+                    <h2 id="route-title">Welcome</h2>
+                    <p id="route-subtitle">Please authenticate to continue.</p>
+                </div>
+                <div class="pill">V1 - Vulnerable</div>
+            </header>
+
+            <!-- Login View -->
+            <section id="view-login" class="view hidden">
+                <div class="card">
+                    <form id="login-form" class="stack-form">
+                        <div class="input-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" placeholder="e.g. admin@authx.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Sign In</button>
+                        <p class="helper">Forgot password? <a href="#/forgot">Reset it here</a></p>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Register View -->
+            <section id="view-register" class="view hidden">
+                <div class="card">
+                    <form id="register-form" class="stack-form">
+                        <div class="input-group">
+                            <label for="register-email">Email Address</label>
+                            <input type="email" id="register-email" placeholder="admin@authx.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" placeholder="Create a password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Create Account</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Forgot Password View -->
+            <section id="view-forgot" class="view hidden">
+                <div class="card">
+                    <p class="helper">Enter your email and we'll generate a reset token for you.</p>
+                    <form id="forgot-form" class="stack-form">
+                        <div class="input-group">
+                            <label for="forgot-email">Email Address</label>
+                            <input type="email" id="forgot-email" placeholder="admin@authx.com" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Request Reset</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Reset Password View -->
+            <section id="view-reset" class="view hidden">
+                <div class="card">
+                    <p class="helper">Use this token to reset your password.</p>
+                    <form id="reset-form" class="stack-form">
+                        <div class="input-group">
+                            <label for="reset-token">Reset Token</label>
+                            <input type="text" id="reset-token" placeholder="reset-email@example.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="reset-password">New Password</label>
+                            <input type="password" id="reset-password" placeholder="New password" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Update Password</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="view hidden">
+                <div class="dashboard-grid">
+                    <!-- Create Ticket -->
+                    <div class="card">
+                        <h3>Create Ticket</h3>
+                        <form id="ticket-form" class="stack-form">
+                            <div class="input-group">
+                                <label for="ticket-title">Title</label>
+                                <input type="text" id="ticket-title" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="ticket-description">Description</label>
+                                <textarea id="ticket-description" rows="3" required></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label for="ticket-severity">Severity</label>
+                                <select id="ticket-severity">
+                                    <option value="LOW">Low</option>
+                                    <option value="MED">Medium</option>
+                                    <option value="HIGH">High</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">Submit Ticket</button>
+                        </form>
+                    </div>
+
+                    <!-- Ticket Search -->
+                    <div class="card">
+                        <h3>Find Ticket</h3>
+                        <p class="helper">Access any ticket directly by its unique ID.</p>
+                        <div class="inline-row" style="margin-bottom: 1rem;">
+                            <input type="text" id="ticket-id-input" placeholder="Ticket ID (UUID)">
+                            <button type="button" id="ticket-id-btn" class="btn-secondary">Find</button>
+                        </div>
+                        <div class="label">Ticket Details</div>
+                        <pre id="ticket-detail" class="json-box">No detail loaded.</pre>
+                    </div>
+                </div>
+
+                <!-- Ticket Edit Section -->
+                <div id="ticket-edit-section" class="card hidden" style="margin-bottom: 1rem; border-color: var(--accent);">
+                    <h3>Edit Ticket</h3>
+                    <form id="ticket-edit-form" class="stack-form">
+                        <input type="hidden" name="ticket-id">
+                        <div class="dashboard-grid" style="margin-bottom: 0;">
+                            <div class="input-group">
+                                <label>Title</label>
+                                <input type="text" name="edit-title" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Severity</label>
+                                <select name="edit-severity">
+                                    <option value="LOW">Low</option>
+                                    <option value="MED">Medium</option>
+                                    <option value="HIGH">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label>Description</label>
+                            <textarea name="edit-description" rows="2" required></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Status</label>
+                            <select name="edit-status">
+                                <option value="OPEN">Open</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="RESOLVED">Resolved</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <!-- Tickets List -->
+                <div class="card">
+                    <div class="table-header">
+                        <h3>Internal Tickets</h3>
+                        <div class="inline-row compact">
+                            <select id="filter-status">
+                                <option value="">Any</option>
+                                <option value="OPEN">Open</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="RESOLVED">Resolved</option>
+                            </select>
+                            <select id="filter-severity">
+                                <option value="">Any</option>
+                                <option value="LOW">Low</option>
+                                <option value="MED">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                            <button id="refresh-tickets" class="btn-secondary">Apply Filters</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Owner</th>
+                                    <th>Severity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-body">
+                                <!-- Tickets injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Audit Logs View (Managers Only) -->
+            <section id="view-logs" class="view hidden">
+                <div class="card">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Resource</th>
+                                    <th>IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-logs-body">
+                                <tr><td colspan="5">No audit logs available.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error window -->
+            <section id="debug-log" class="logger" style="margin-top: 2rem;">
+                <div class="card">
+                    <div class="table-header">
+                        <p class="label" style="color: var(--warn);">[ERROR]: Server Response</p>
+                        <button id="clear-log" class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;">Clear</button>
+                    </div>
+                    <pre id="response-log">No errors.</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
