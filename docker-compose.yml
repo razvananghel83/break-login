@@ -11,7 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data_v1:/var/lib/postgresql              # storage-ul bazei de date
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # creearea bazei de date, dacă nu există deja
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # script-ul de inițializare a DB
 
   app:
     build:
@@ -23,12 +23,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/home/razvan-anghel-authx/app # Folosesc mounting în dev pentru rapiditate
-      - /home/razvan-anghel-authx/app/node_modules
+      # Folosesc mounting în dev pentru rapiditate
+      - .:/home/razvan-anghel-authx/app
     environment:
       - DB_URL=postgres://postgres:postgres@db:5432/authx_db_v1
     depends_on:
       - db
 
 volumes:
-  postgres_data_v1:
+  postgres_data_v1:   # stocarea locală a bazei de date
