@@ -24,14 +24,14 @@ The project is divided into two distinct versions, managed via distinct Git bran
    * Lack of rate limiting (allows Brute Force).
    * Active User Enumeration through specific error messages.
    * Unsecured sessions (no HttpOnly/Secure flags).
-   * DB with default super user ( postgres ) and no password.
+   * DB with default password for the super user postgres.
 
 2. **Secured Version (`v2`)**:
    * Modern hashing using for passwords.
    * Implementation of Rate Limiting and Account Lockout.
    * Generic error messages and uniform response time.
    * Session hardening (HttpOnly, Secure, SameSite).
-   * DB uses an overwritten super user with a secret complex password. Another user is created and has only CRUD operations on the database.
+   * DB uses a secure password for the super user postgres stored via docker secrets. Another user is created and used by the app. It has  CRUD operations only on the application tables.
 
 ## Installation
 
@@ -46,7 +46,12 @@ The project is divided into two distinct versions, managed via distinct Git bran
    # OR
    git checkout secure      # For v2
    ```
-2. Configure the `.env` file followint the instructions bellow.
+2. For the secured branch, create the Docker Secrets files at the repository root:
+   ```bash
+   printf 'your_postgres_superuser_password' > db_password.txt
+   printf 'your_app_user_password' > app_password.txt
+   ```
+   These files are mounted by Docker Compose as secrets, so they must exist before starting the containers.
 3. Start the containers:
    ```bash
    docker compose up --build
@@ -54,12 +59,20 @@ The project is divided into two distinct versions, managed via distinct Git bran
 
 The application will be available at `http://localhost:3000`.
 
-# .env configuration:
+# Docker secrets configuration:
 
-A local .env file is required for security reasons on the second branch. It should contain:
+The secured version no longer uses those two docker secret files in the project root:
 
-- Database superuser credentials (overwrites default 'postgres' user)
-* POSTGRES_USER=your_superuser_name
-* POSTGRES_PASSWORD=your_secure_password
+- `db_password.txt`: password for the PostgreSQL superuser `postgres`.
+- `app_password.txt`: password for the limited application user `authx_app`.
+
+Each file should contain only the password value, with no extra quotes or surrounding text.
+
+Example:
+
+```bash
+echo 'your_postgres_superuser_password' > db_password.txt
+echo 'your_app_user_password' > app_password.txt
+```
 
 ---
