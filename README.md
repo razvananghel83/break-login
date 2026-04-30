@@ -2,11 +2,6 @@
 
 * Project created for the course: **Secure Software Applications Development**.
 
-* **Student name**: Anghel Răzvan-Alexandru
-
-* **Video link**: *Not here yet*
-
-
 ## Project Objective
 The purpose of this project is a practical understanding of how authentication systems are attacked and their correct implementation to resist real threats. The project follows a **Secure SDLC** flow (Build-Hack-Fix-Retest).
 

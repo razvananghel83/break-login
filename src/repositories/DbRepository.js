@@ -43,10 +43,6 @@ class DbRepository {
     return this.userRepository.updatePasswordAndInvalidateToken(userId, newPasswordHash);
   }
 
-  async updatePasswordByEmail(email, newPassword) {
-    return this.userRepository.updatePasswordByEmail(email, newPassword);
-  }
-
   async createTicket(title, description, severity, ownerId) {
     return this.ticketRepository.createTicket(title, description, severity, ownerId);
   }
