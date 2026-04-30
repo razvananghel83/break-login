@@ -1,3 +1,5 @@
 node_modules
 
-.env
+# Docker secrets
+app_password.txt
+db_password.txt

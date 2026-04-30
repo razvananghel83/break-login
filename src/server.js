@@ -7,12 +7,30 @@ const DbRepository = require('./repositories/DbRepository');
 const AuditLogger = require('./utils/auditLogger');
 const createAuditLoggerMiddleware = require('./middleware/auditLoggerMiddleware');
 
+const fs = require('fs');
+
 const app = express();
 const port = 3000;
 
-// Conexiunea la baza de date
+// Helper to read secrets from Docker Secrets mount
+function getSecret(secretPath) {
+  try {
+    return fs.readFileSync(secretPath, 'utf8').trim();
+  } catch (err) {
+    // Fallback if secret file is not available
+    return null;
+  }
+}
+
+const dbPassword = getSecret('/run/secrets/app_password');
+const dbUser = process.env.DB_USER || 'authx_app';
+const dbHost = process.env.DB_HOST || 'localhost';
+const dbPort = process.env.DB_PORT || '5432';
+const dbName = process.env.DB_NAME || 'authx_db_v2';
+
+// Database connection
 const pool = new Pool({
-  connectionString: process.env.DB_URL,
+  connectionString: `postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`,
 });
 
 const repo = new DbRepository(pool);

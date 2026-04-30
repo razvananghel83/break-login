@@ -1,34 +1,57 @@
 services:
   db:
-    # Voi folosi două versiuni diferite pentru baza de date: v1 pentru vulnerable și v2 pentru secure
     image: postgres:latest
-    container_name: authx-db-v1
+     # Voi folosi două versiuni diferite pentru baza de date: v1 pentru vulnerable și v2 pentru secure
+    container_name: authx-db-v2
     restart: always
+    # Voi folosi Docker Secrets pentru a stoca parola super user-ului
+    # și credențialele user-ului creat special pentru acces la tabelele folosite de aplicație
+    secrets:
+      - db_password
+      - app_password
     environment:
-      - POSTGRES_PASSWORD=postgres  # User-ul default pentru postgres, fără a fi suprascrisă parola
-      - POSTGRES_DB=authx_db_v1
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password   
+      - POSTGRES_DB=authx_db_v2
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data_v1:/var/lib/postgresql              # storage-ul bazei de date
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # script-ul de inițializare a DB
+      - postgres_data_v2:/var/lib/postgresql         # mapez storage-ul bazei de date în interiorul container-ului
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh    # script-ul de inițializare a DB
+    # Un healthcheck pentru a verifică dacă DB-ul este funcțional și dacă poate accepta conexiuni
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app-vulnerable
+    container_name: app-secure
     # Utilizatorul acesta va apărea în terminalul containerului
     user: "razvan-anghel-authx"
     ports:
       - "3000:3000"
     volumes:
-      # Folosesc mounting în dev pentru rapiditate
-      - .:/home/razvan-anghel-authx/app
+      - .:/home/razvan-anghel-authx/app  # Folosesc mounting în dev pentru rapiditate
+    secrets:
+      - app_password
     environment:
-      - DB_URL=postgres://postgres:postgres@db:5432/authx_db_v1
+      - DB_USER=authx_app    # User-ul care va avea acces doar la tabelele aplicației
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=authx_db_v2
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
-  postgres_data_v1:   # stocarea locală a bazei de date
+  postgres_data_v2:   # stocarea locală a bazei de date
+
+secrets:
+  db_password:
+    file: ./db_password.txt
+  app_password:
+    file: ./app_password.txt
