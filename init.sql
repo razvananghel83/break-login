@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     resource VARCHAR(255),
     resource_id VARCHAR(255),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ip_address VARCHAR(15)
+    ip_address VARCHAR(45)
 );
 
 -- Inserarea unui user MANAGER ( pentru test și pentru demo )
