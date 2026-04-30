@@ -88,6 +88,14 @@ body {
     margin-bottom: 0.45rem;
 }
 
+.label-dark {
+    color: var(--muted);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.45rem;
+}
+
 #user-email {
     font-size: 0.88rem;
     margin-bottom: 0.8rem;
