@@ -35,7 +35,11 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/home/razvan-anghel-authx/app  # Folosesc mounting în dev pentru rapiditate
+      # Folosesc mounting în dev pentru rapiditate
+      - .:/home/razvan-anghel-authx/app 
+      # Un volum anonim pentru node_modules pentru a evita interferența 
+      # dintre dependințele locale și cele din container
+      - /home/razvan-anghel-authx/app/node_modules
     secrets:
       - app_password
     environment:
