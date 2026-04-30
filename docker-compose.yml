@@ -25,6 +25,9 @@ services:
     volumes:
       # Folosesc mounting în dev pentru rapiditate
       - .:/home/razvan-anghel-authx/app
+      # Un volum anonim pentru node_modules pentru a evita interferența 
+      # dintre dependințele locale și cele din container
+      - /home/razvan-anghel-authx/app/node_modules
     environment:
       - DB_URL=postgres://postgres:postgres@db:5432/authx_db_v1
     depends_on:
