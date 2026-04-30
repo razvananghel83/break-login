@@ -19,6 +19,30 @@ class DbRepository {
     return this.userRepository.findUserByEmail(email);
   }
 
+  async incrementFailedAttempts(email) {
+    return this.userRepository.incrementFailedAttempts(email);
+  }
+
+  async resetFailedAttempts(email) {
+    return this.userRepository.resetFailedAttempts(email);
+  }
+
+  async lockAccount(email) {
+    return this.userRepository.lockAccount(email);
+  }
+
+  async setResetToken(email, tokenHash, expires) {
+    return this.userRepository.setResetToken(email, tokenHash, expires);
+  }
+
+  async findUserByResetToken(tokenHash) {
+    return this.userRepository.findUserByResetToken(tokenHash);
+  }
+
+  async updatePasswordAndInvalidateToken(userId, newPasswordHash) {
+    return this.userRepository.updatePasswordAndInvalidateToken(userId, newPasswordHash);
+  }
+
   async updatePasswordByEmail(email, newPassword) {
     return this.userRepository.updatePasswordByEmail(email, newPassword);
   }

@@ -15,7 +15,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         password_hash TEXT NOT NULL,
         role user_role DEFAULT 'ANALYST',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        locked BOOLEAN DEFAULT FALSE
+        locked BOOLEAN DEFAULT FALSE,
+        failed_attempts INT DEFAULT 0,
+        reset_token_hash TEXT,
+        reset_token_expires TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS tickets (
@@ -52,5 +55,5 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     -- Permit CRUD strict pe tabelele din appplicație
     GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, tickets, audit_logs TO authx_app;
 
-    INSERT INTO users (email, password_hash, role) VALUES ('admin@authx.com', 'password123', 'MANAGER');
+    INSERT INTO users (email, password_hash, role) VALUES ('admin@authx.com', '$2b$10$Ut/GBNwwCR5vcRDIKjoHO.2G9JKJ8JuE9.bY1ds00rFRAlnx3mgIi', 'MANAGER');
 EOSQL
