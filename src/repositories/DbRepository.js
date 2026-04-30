@@ -27,8 +27,8 @@ class DbRepository {
     return this.ticketRepository.createTicket(title, description, severity, ownerId);
   }
 
-  async listTickets(status, severity) {
-    return this.ticketRepository.listTickets(status, severity);
+  async listTickets(status, severity, ownerId = null) {
+    return this.ticketRepository.listTicketsByOwner(ownerId, status, severity);
   }
 
   async getTicketById(ticketId) {
