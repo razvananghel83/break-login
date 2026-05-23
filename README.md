@@ -6,33 +6,36 @@
 The purpose of this project is a practical understanding of how authentication systems are attacked and their correct implementation to resist real threats. The project follows a **Secure SDLC** flow (Build-Hack-Fix-Retest).
 
 ## Technical Stack
-* **Backend:** Node.js with Express.js (manual implementation of auth logic).
+* **Backend:** Node.js with Express.js (manual implementation of auth logic) running inside a Docker container.
 * **Database:** PostgreSQL (containerized).
 * **Infrastructure:** Docker & Docker Compose.
-* **Testing Tools:** Burp Suite Community Edition, Postman, `psql`.
+* **Testing Tools:** Burp Suite Community Edition, `psql` shell.
 
 ## Project Architecture
 The project is divided into two distinct versions, managed via distinct Git branches:
 
 1. **Vulnerable Version (`v1`)**:
    * Password storage in plain text.
+   * Predictible and reusable password reset tokens without expiry time.
    * Lack of rate limiting (allows Brute Force).
    * Active User Enumeration through specific error messages.
-   * Unsecured sessions (no HttpOnly/Secure flags).
+   * Unsecured sessions (no HttpOnly/Secure flags) with no expiration.
    * DB with default password for the super user postgres.
+   * No input validation ( allows XSS ).
 
 2. **Secured Version (`v2`)**:
-   * Modern hashing using for passwords.
+   * Modern bcrypt hashing for passwords.
+   * Randomly generated password rest tokens with 15 minute validity.
    * Implementation of Rate Limiting and Account Lockout.
    * Generic error messages and uniform response time.
-   * Session hardening (HttpOnly, Secure, SameSite).
+   * Session hardening (HttpOnly, Secure, SameSite) and 15 minute validity.
    * DB uses a secure password for the super user postgres stored via docker secrets. Another user is created and used by the app. It has  CRUD operations only on the application tables.
+   * All user input is processed into HTML safe characters to avoid XSS.
 
 ## Installation
 
 ### Pre-requisites
 * Docker & Docker Compose installed.
-* Student username configured in environment: `razvan-anghel`.
 
 ### Starting the application
 1. Clone the repository and access the desired branch:
@@ -49,7 +52,7 @@ The project is divided into two distinct versions, managed via distinct Git bran
    These files are mounted by Docker Compose as secrets, so they must exist before starting the containers.
 3. Start the containers:
    ```bash
-   docker compose up --build
+   docker compose up --build -d
    ```
 
 The application will be available at `http://localhost:3000`.
@@ -63,11 +66,9 @@ The secured version no longer uses those two docker secret files in the project 
 
 Each file should contain only the password value, with no extra quotes or surrounding text.
 
-Example:
-
+Example file content:
 ```bash
-echo 'your_postgres_superuser_password' > db_password.txt
-echo 'your_app_user_password' > app_password.txt
+super-Secret_password
 ```
 
 ---
